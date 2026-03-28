@@ -1115,6 +1115,21 @@
   </div>
 </div>
 
+<!-- NEW SPOOL PROMPT -->
+<div class="sheet-overlay" id="newSpoolPromptOverlay">
+  <div class="sheet" style="border-radius:20px 20px 0 0; padding-bottom: var(--safe-bottom)">
+    <div class="sheet-handle"></div>
+    <div style="padding: 24px 24px 8px; text-align:center">
+      <div style="font-size:2.5rem; margin-bottom:12px">&#x1F9F5;</div>
+      <div style="font-size:1.1rem; font-weight:700; color:var(--text); margin-bottom:8px">Unknown Tag Detected</div>
+      <div style="font-size:0.875rem; color:var(--text3); line-height:1.5; margin-bottom:24px">This tag isn't in your library yet. Add this spool now and the tag will be programmed automatically.</div>
+      <button class="form-save-btn" onclick="createFromScan()" style="margin-bottom:10px">&#x2795; Add New Spool</button>
+      <button class="form-delete-btn" onclick="dismissNewSpoolPrompt()" style="background:var(--grouped); color:var(--text3)">Cancel</button>
+      <div style="height:8px"></div>
+    </div>
+  </div>
+</div>
+
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
 
@@ -1392,6 +1407,15 @@ function saveSpool() {
   save(spools);
   closeForm();
   render();
+
+  // If triggered from a scan, immediately prompt to program the tag
+  if (window._programAfterSave && !editingId) {
+    window._programAfterSave = false;
+    setTimeout(() => {
+      openDetail(spool.id);
+      setTimeout(() => programNewTag(spool.id), 400);
+    }, 300);
+  }
 }
 
 function deleteSpool() {
@@ -1470,6 +1494,7 @@ async function startScan() {
     };
 
     nfcReader.onreading = ({ message }) => {
+      // Try to find a known spool URL
       for (const record of message.records) {
         if (record.recordType === 'url') {
           const decoder = new TextDecoder();
@@ -1477,20 +1502,21 @@ async function startScan() {
           const params = new URLSearchParams(url.split('?')[1] || '');
           const id = params.get('id') || params.get('spool');
           if (id) {
-            stopScan();
             const spools = load();
             if (spools.find(s => s.id === id)) {
+              // Known spool — open it
+              stopScan();
               openDetail(id);
               const card = document.getElementById('card-' + id);
               if (card) card.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            } else {
-              showToast('Spool ' + id + ' not found in your library');
+              return;
             }
-            return;
           }
         }
       }
-      bannerText.textContent = 'Tag not recognized. Try another.';
+      // Unknown or blank tag — prompt to create new spool
+      stopScan();
+      showNewSpoolPrompt();
     };
 
   } catch(err) {
@@ -1507,7 +1533,30 @@ function stopScan() {
   document.getElementById('scanBanner').style.display = 'none';
 }
 
+function showNewSpoolPrompt() {
+  // Show a confirmation toast-style prompt
+  const overlay = document.getElementById('newSpoolPromptOverlay');
+  overlay.classList.add('open');
+}
+
+function dismissNewSpoolPrompt() {
+  document.getElementById('newSpoolPromptOverlay').classList.remove('open');
+}
+
+function createFromScan() {
+  dismissNewSpoolPrompt();
+  // Flag that after save we should immediately write the NFC tag
+  window._programAfterSave = true;
+  openForm(null);
+}
+
 // ── NFC WRITE ──────────────────────────────────────────────
+async function programNewTag(id) {
+  // Called right after creating a spool from scan — auto-triggers write
+  detailId = id;
+  await writeNfcTag();
+}
+
 async function writeNfcTag() {
   const btn = document.getElementById('nfcWriteBtn');
   const status = document.getElementById('nfcStatus');
