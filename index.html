@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -841,12 +841,12 @@
   <!-- NAV -->
   <div class="navbar">
     <div class="navbar-inner">
-      <div class="nav-title">🧵 Filament</div>
+      <div class="nav-title">&#x1F9F5; Filament</div>
       <span class="nav-count" id="navCount"></span>
     </div>
     <div class="search-bar">
       <div class="search-wrap">
-        <span class="search-icon">🔍</span>
+        <span class="search-icon">&#x1F50D;</span>
         <input id="searchInput" type="search" placeholder="Search color, brand, material…" oninput="render()" />
       </div>
     </div>
@@ -857,7 +857,7 @@
   <div class="scroll-area">
     <div class="spool-list" id="spoolList"></div>
     <div class="empty" id="emptyState" style="display:none">
-      <div class="empty-icon">🧵</div>
+      <div class="empty-icon">&#x1F9F5;</div>
       <h3>No spools found</h3>
       <p>Try a different search or filter.</p>
     </div>
@@ -900,7 +900,7 @@
     </div>
 
     <div class="detail-actions">
-      <button class="detail-btn detail-btn-save" onclick="saveDetailAmount()">💾 Save Amount</button>
+      <button class="detail-btn detail-btn-save" onclick="saveDetailAmount()">&#x1F4BE; Save Amount</button>
       <button class="detail-btn detail-btn-edit" onclick="openFormFromDetail()">Edit</button>
       <button class="detail-btn detail-btn-close" onclick="closeDetail()">Close</button>
     </div>
@@ -1025,8 +1025,8 @@ const FILTERS = [
   { label:'ABS', val:'ABS' },
   { label:'TPU', val:'TPU' },
   { label:'ASA', val:'ASA' },
-  { label:'✅ AMS', val:'ams' },
-  { label:'⚠️ Low', val:'low' },
+  { label:'&#x2705; AMS', val:'ams' },
+  { label:'&#x26A0;&#xFE0F; Low', val:'low' },
 ];
 
 function load() {
@@ -1106,7 +1106,7 @@ function buildCard(s) {
       <div class="card-info">
         <div class="card-name">${esc(s.color)} ${esc(s.material)}</div>
         <div class="card-sub">${esc(s.brand)}</div>
-        ${s.location ? `<div class="card-location">📍 ${esc(s.location)}</div>` : ''}
+        ${s.location ? `<div class="card-location">&#x1F4CD; ${esc(s.location)}</div>` : ''}
       </div>
     </div>
     <div class="card-badges">${badges}</div>
@@ -1141,8 +1141,8 @@ function openDetail(id) {
   const info = document.getElementById('dInfoSection');
   info.innerHTML = [
     ['Location', s.location || '—'],
-    ['AMS Safe', s.ams ? '✅ Yes' : '❌ No'],
-    ['Bambu RFID', s.rfid ? '📡 Yes' : 'No'],
+    ['AMS Safe', s.ams ? '&#x2705; Yes' : '&#x274C; No'],
+    ['Bambu RFID', s.rfid ? '&#x1F4E1; Yes' : 'No'],
   ].map(([k,v]) => `<div class="detail-row"><span class="detail-row-key">${k}</span><span class="detail-row-val">${v}</span></div>`).join('');
 
   const notesEl = document.getElementById('dNotesSection');
