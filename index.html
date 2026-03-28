@@ -90,6 +90,53 @@
       font-weight: 500;
     }
 
+    /* Scan banner */
+    .scan-banner {
+      background: var(--accent);
+      padding: 10px 16px;
+      animation: slideDown 0.2s ease;
+    }
+
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .scan-banner-inner {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      max-width: 430px;
+      margin: 0 auto;
+    }
+
+    .scan-pulse {
+      font-size: 1.2rem;
+      animation: nfcPulseBtn 0.8s ease infinite;
+    }
+
+    #scanBannerText {
+      flex: 1;
+      color: white;
+      font-size: 0.875rem;
+      font-weight: 600;
+    }
+
+    .scan-cancel {
+      background: rgba(255,255,255,0.2);
+      border: none;
+      color: white;
+      font-family: inherit;
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 100px;
+      cursor: pointer;
+    }
+
+    .nav-scan-btn { color: var(--accent); }
+    .nav-scan-btn.scanning { color: white; background: var(--accent); }
+
     .nav-btn {
       width: 34px;
       height: 34px;
@@ -882,6 +929,16 @@
     <div class="navbar-inner">
       <div class="nav-title">&#x1F9F5; Filament</div>
       <span class="nav-count" id="navCount"></span>
+      <button class="nav-btn nav-scan-btn" id="scanBtn" onclick="startScan()" title="Scan a spool tag">&#x1F4E1;</button>
+    </div>
+
+    <!-- Scan banner -->
+    <div class="scan-banner" id="scanBanner" style="display:none">
+      <div class="scan-banner-inner">
+        <span class="scan-pulse">&#x1F4E1;</span>
+        <span id="scanBannerText">Hold phone over a spool tag&hellip;</span>
+        <button class="scan-cancel" onclick="stopScan()">Cancel</button>
+      </div>
     </div>
     <div class="search-bar">
       <div class="search-wrap">
@@ -1382,6 +1439,72 @@ function showToast(msg) {
   t.textContent = msg;
   t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+// ── NFC SCAN ───────────────────────────────────────────────
+let nfcReader = null;
+let scanAbort = null;
+
+async function startScan() {
+  if (!('NDEFReader' in window)) {
+    showToast('Web NFC not supported — use Chrome on Android');
+    return;
+  }
+
+  const btn = document.getElementById('scanBtn');
+  const banner = document.getElementById('scanBanner');
+  const bannerText = document.getElementById('scanBannerText');
+
+  btn.classList.add('scanning');
+  banner.style.display = 'block';
+  bannerText.textContent = 'Hold phone over a spool tag\u2026';
+
+  try {
+    scanAbort = new AbortController();
+    nfcReader = new NDEFReader();
+
+    await nfcReader.scan({ signal: scanAbort.signal });
+
+    nfcReader.onreadingerror = () => {
+      bannerText.textContent = 'Could not read tag. Try again.';
+    };
+
+    nfcReader.onreading = ({ message }) => {
+      for (const record of message.records) {
+        if (record.recordType === 'url') {
+          const decoder = new TextDecoder();
+          const url = decoder.decode(record.data);
+          const params = new URLSearchParams(url.split('?')[1] || '');
+          const id = params.get('id') || params.get('spool');
+          if (id) {
+            stopScan();
+            const spools = load();
+            if (spools.find(s => s.id === id)) {
+              openDetail(id);
+              const card = document.getElementById('card-' + id);
+              if (card) card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            } else {
+              showToast('Spool ' + id + ' not found in your library');
+            }
+            return;
+          }
+        }
+      }
+      bannerText.textContent = 'Tag not recognized. Try another.';
+    };
+
+  } catch(err) {
+    stopScan();
+    if (err.name !== 'AbortError') {
+      showToast('NFC error: ' + (err.message || err.name));
+    }
+  }
+}
+
+function stopScan() {
+  if (scanAbort) { scanAbort.abort(); scanAbort = null; }
+  document.getElementById('scanBtn').classList.remove('scanning');
+  document.getElementById('scanBanner').style.display = 'none';
 }
 
 // ── NFC WRITE ──────────────────────────────────────────────
