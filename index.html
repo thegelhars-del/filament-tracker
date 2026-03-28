@@ -543,6 +543,45 @@
     .detail-btn-close { background: var(--grouped); color: var(--text2); }
     .detail-btn-save { background: var(--green); color: white; }
 
+    /* NFC Write Button */
+    .nfc-write-btn {
+      width: 100%;
+      padding: 14px;
+      border-radius: 14px;
+      background: #F2F2F7;
+      border: 2px dashed #C7C7CC;
+      font-family: inherit;
+      font-size: 0.93rem;
+      font-weight: 600;
+      color: #3C3C43;
+      cursor: pointer;
+      transition: all 0.15s;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .nfc-write-btn:active { opacity: 0.7; }
+    .nfc-write-btn.writing {
+      background: #EFF6FF;
+      border-color: var(--accent);
+      color: var(--accent);
+      animation: nfcPulseBtn 1s ease infinite;
+    }
+    .nfc-write-btn.success { background: #EDFAF1; border-color: var(--green); color: #1A8F3C; border-style: solid; }
+    .nfc-write-btn.error   { background: #FFF0EF; border-color: var(--red);   color: var(--red);   border-style: solid; }
+
+    @keyframes nfcPulseBtn {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0.6; }
+    }
+
+    .nfc-status {
+      font-size: 0.78rem;
+      color: var(--text3);
+      text-align: center;
+      margin-top: 6px;
+      min-height: 18px;
+    }
+
     /* ── FORM SHEET ──────────────────────────────────────── */
     .form-header {
       display: flex;
@@ -903,6 +942,14 @@
       <button class="detail-btn detail-btn-save" onclick="saveDetailAmount()">&#x1F4BE; Save Amount</button>
       <button class="detail-btn detail-btn-edit" onclick="openFormFromDetail()">Edit</button>
       <button class="detail-btn detail-btn-close" onclick="closeDetail()">Close</button>
+    </div>
+
+    <!-- NFC Write -->
+    <div style="padding: 0 20px 20px;">
+      <button class="nfc-write-btn" id="nfcWriteBtn" onclick="writeNfcTag()">
+        <span id="nfcBtnIcon">&#x1F4E1;</span> Program NFC Tag
+      </button>
+      <div class="nfc-status" id="nfcStatus"></div>
     </div>
   </div>
 </div>
@@ -1322,6 +1369,59 @@ function showToast(msg) {
   t.textContent = msg;
   t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+// ── NFC WRITE ──────────────────────────────────────────────
+async function writeNfcTag() {
+  const btn = document.getElementById('nfcWriteBtn');
+  const status = document.getElementById('nfcStatus');
+
+  if (!detailId) return;
+
+  // Check support
+  if (!('NDEFReader' in window)) {
+    btn.className = 'nfc-write-btn error';
+    status.textContent = 'Web NFC not supported. Use Chrome on Android.';
+    setTimeout(() => resetNfcBtn(), 3000);
+    return;
+  }
+
+  const url = `${location.origin}${location.pathname}?id=${encodeURIComponent(detailId)}`;
+
+  btn.className = 'nfc-write-btn writing';
+  btn.querySelector('#nfcBtnIcon').textContent = '&#x1F4E1;';
+  status.textContent = 'Hold phone over NFC sticker\u2026';
+
+  try {
+    const ndef = new NDEFReader();
+    await ndef.write({ records: [{ recordType: 'url', data: url }] });
+    btn.className = 'nfc-write-btn success';
+    document.getElementById('nfcBtnIcon').textContent = '&#x2705;';
+    btn.querySelector('span').nextSibling.textContent = ' Tag programmed!';
+    status.textContent = url;
+    setTimeout(() => resetNfcBtn(), 4000);
+  } catch (err) {
+    btn.className = 'nfc-write-btn error';
+    document.getElementById('nfcBtnIcon').textContent = '&#x274C;';
+    btn.querySelector('span').nextSibling.textContent = ' Write failed';
+    if (err.name === 'NotAllowedError') {
+      status.textContent = 'Permission denied. Try again and allow NFC access.';
+    } else if (err.name === 'AbortError') {
+      status.textContent = 'Cancelled.';
+    } else {
+      status.textContent = err.message || 'Unknown error.';
+    }
+    setTimeout(() => resetNfcBtn(), 3500);
+  }
+}
+
+function resetNfcBtn() {
+  const btn = document.getElementById('nfcWriteBtn');
+  const status = document.getElementById('nfcStatus');
+  if (!btn) return;
+  btn.className = 'nfc-write-btn';
+  btn.innerHTML = '<span id="nfcBtnIcon">&#x1F4E1;</span> Program NFC Tag';
+  status.textContent = '';
 }
 
 // ── INIT ───────────────────────────────────────────────────
