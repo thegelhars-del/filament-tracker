@@ -47,7 +47,7 @@
       overscroll-behavior: none;
     }
 
-    /* â”€â”€ APP SHELL â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+    /* ── APP SHELL ────────────────────────────────────────── */
     #app {
       height: 100%;
       display: flex;
@@ -57,7 +57,7 @@
       position: relative;
     }
 
-    /* â”€â”€ NAV BAR â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+    /* ── NAV BAR ─────────────────────────────────────────── */
     .navbar {
       background: rgba(255,255,255,0.85);
       backdrop-filter: saturate(180%) blur(20px);
@@ -141,7 +141,7 @@
       pointer-events: none;
     }
 
-    /* â”€â”€ FILTER PILLS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+    /* ── FILTER PILLS ────────────────────────────────────── */
     .filter-row {
       display: flex;
       gap: 6px;
@@ -172,7 +172,7 @@
 
     .pill.active { background: var(--accent); color: white; }
 
-    /* â”€â”€ SCROLL AREA â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+    /* ── SCROLL AREA ─────────────────────────────────────── */
     .scroll-area {
       flex: 1;
       overflow-y: auto;
@@ -180,7 +180,7 @@
       padding: 0 16px 120px;
     }
 
-    /* â”€â”€ SPOOL CARDS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+    /* ── SPOOL CARDS ─────────────────────────────────────── */
     .spool-list {
       display: flex;
       flex-direction: column;
@@ -298,7 +298,7 @@
     .badge-rfid { background: #FFF4E6; color: #C05E00; }
     .badge-low  { background: #FFF0EF; color: #D70015; }
 
-    /* â”€â”€ EMPTY STATE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+    /* ── EMPTY STATE ─────────────────────────────────────── */
     .empty {
       text-align: center;
       padding: 60px 24px;
@@ -309,7 +309,7 @@
     .empty h3 { font-size: 1rem; font-weight: 600; color: var(--text2); margin-bottom: 6px; }
     .empty p  { font-size: 0.875rem; line-height: 1.5; }
 
-    /* â”€â”€ FAB â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+    /* ── FAB ─────────────────────────────────────────────── */
     .fab {
       position: fixed;
       bottom: calc(24px + var(--safe-bottom));
@@ -337,7 +337,7 @@
       .fab { right: 20px; }
     }
 
-    /* â”€â”€ BOTTOM SHEET â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+    /* ── BOTTOM SHEET ────────────────────────────────────── */
     .sheet-overlay {
       display: none;
       position: fixed;
@@ -375,7 +375,7 @@
       margin: 10px auto 0;
     }
 
-    /* â”€â”€ DETAIL SHEET â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+    /* ── DETAIL SHEET ────────────────────────────────────── */
     .detail-header {
       display: flex;
       align-items: center;
@@ -543,7 +543,7 @@
     .detail-btn-close { background: var(--grouped); color: var(--text2); }
     .detail-btn-save { background: var(--green); color: white; }
 
-    /* â”€â”€ FORM SHEET â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+    /* ── FORM SHEET ──────────────────────────────────────── */
     .form-header {
       display: flex;
       align-items: center;
@@ -801,7 +801,7 @@
       -webkit-tap-highlight-color: transparent;
     }
 
-    /* â”€â”€ NFC HIGHLIGHT â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+    /* ── NFC HIGHLIGHT ───────────────────────────────────── */
     .nfc-highlight {
       animation: nfcPulse 0.5s ease;
     }
@@ -812,7 +812,7 @@
       100% { box-shadow: 0 0 0 0 rgba(0,122,255,0); }
     }
 
-    /* â”€â”€ TOAST â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+    /* ── TOAST ───────────────────────────────────────────── */
     .toast {
       position: fixed;
       bottom: calc(90px + var(--safe-bottom));
@@ -841,13 +841,13 @@
   <!-- NAV -->
   <div class="navbar">
     <div class="navbar-inner">
-      <div class="nav-title">ðŸ§µ Filament</div>
+      <div class="nav-title">🧵 Filament</div>
       <span class="nav-count" id="navCount"></span>
     </div>
     <div class="search-bar">
       <div class="search-wrap">
-        <span class="search-icon">ðŸ”</span>
-        <input id="searchInput" type="search" placeholder="Search color, brand, materialâ€¦" oninput="render()" />
+        <span class="search-icon">🔍</span>
+        <input id="searchInput" type="search" placeholder="Search color, brand, material…" oninput="render()" />
       </div>
     </div>
     <div class="filter-row" id="filterRow"></div>
@@ -857,7 +857,7 @@
   <div class="scroll-area">
     <div class="spool-list" id="spoolList"></div>
     <div class="empty" id="emptyState" style="display:none">
-      <div class="empty-icon">ðŸ§µ</div>
+      <div class="empty-icon">🧵</div>
       <h3>No spools found</h3>
       <p>Try a different search or filter.</p>
     </div>
@@ -884,7 +884,7 @@
     <!-- Quick amount update -->
     <div class="amount-section">
       <div class="amount-section-title">Amount Remaining</div>
-      <div class="amount-big" id="dAmountBig">â€”</div>
+      <div class="amount-big" id="dAmountBig">—</div>
       <input type="range" class="amount-slider" id="dAmountSlider" min="0" max="100" step="5"
         oninput="updateDetailAmount(this.value)" />
       <div style="display:flex;justify-content:space-between;font-size:0.7rem;color:var(--text4);margin-top:6px">
@@ -900,7 +900,7 @@
     </div>
 
     <div class="detail-actions">
-      <button class="detail-btn detail-btn-save" onclick="saveDetailAmount()">ðŸ’¾ Save Amount</button>
+      <button class="detail-btn detail-btn-save" onclick="saveDetailAmount()">💾 Save Amount</button>
       <button class="detail-btn detail-btn-edit" onclick="openFormFromDetail()">Edit</button>
       <button class="detail-btn detail-btn-close" onclick="closeDetail()">Close</button>
     </div>
@@ -931,7 +931,7 @@
         <div class="form-row">
           <label>Material</label>
           <select id="fMaterial">
-            <option value="">Selectâ€¦</option>
+            <option value="">Select…</option>
             <option>PLA</option><option>PLA+</option><option>PLA Basic</option>
             <option>PETG</option><option>ABS</option><option>ASA</option>
             <option>TPU 95A</option><option>TPU 87A</option>
@@ -987,7 +987,7 @@
       <div class="form-section-title">Notes</div>
       <div class="form-group">
         <div class="form-row">
-          <textarea id="fNotes" rows="3" placeholder="Drying tips, nozzle requirements, print tempâ€¦"></textarea>
+          <textarea id="fNotes" rows="3" placeholder="Drying tips, nozzle requirements, print temp…"></textarea>
         </div>
       </div>
 
@@ -1002,7 +1002,7 @@
 <div class="toast" id="toast"></div>
 
 <script>
-// â”€â”€ DATA â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── DATA ───────────────────────────────────────────────────
 const KEY = 'filament_v2';
 let editingId = null;
 let detailId  = null;
@@ -1010,9 +1010,9 @@ let activeFilter = 'all';
 
 const SAMPLES = [
   { id:'SP-001', brand:'Bambu Lab',  material:'PLA Basic', color:'Bambu Green',       colorHex:'#2DB55D', amount:80, location:'AMS Slot 1',  rfid:true,  ams:true,  notes:'Default spool. Great all-rounder.' },
-  { id:'SP-002', brand:'Bambu Lab',  material:'PLA Basic', color:'Matte White',        colorHex:'#F0EEE9', amount:45, location:'AMS Slot 2',  rfid:true,  ams:true,  notes:'Shows fingerprints easily â€” handle with care.' },
+  { id:'SP-002', brand:'Bambu Lab',  material:'PLA Basic', color:'Matte White',        colorHex:'#F0EEE9', amount:45, location:'AMS Slot 2',  rfid:true,  ams:true,  notes:'Shows fingerprints easily — handle with care.' },
   { id:'SP-003', brand:'eSUN',       material:'PETG',      color:'Transparent Blue',   colorHex:'#4488CC', amount:95, location:'Shelf A',     rfid:false, ams:true,  notes:'Brand new. Dry before use if stored >2 weeks.' },
-  { id:'SP-004', brand:'Polymaker',  material:'ASA',       color:'Urban Grey',         colorHex:'#8A8D8F', amount:60, location:'Dry Box 1',   rfid:false, ams:false, notes:'Enclosure only â€” warps badly open air.' },
+  { id:'SP-004', brand:'Polymaker',  material:'ASA',       color:'Urban Grey',         colorHex:'#8A8D8F', amount:60, location:'Dry Box 1',   rfid:false, ams:false, notes:'Enclosure only — warps badly open air.' },
   { id:'SP-005', brand:'Bambu Lab',  material:'TPU 95A',   color:'Jet Black',          colorHex:'#1A1A1A', amount:15, location:'Shelf B',     rfid:true,  ams:false, notes:'Running low! Direct feed only.' },
   { id:'SP-006', brand:'Hatchbox',   material:'PLA+',      color:'Silk Gold',          colorHex:'#D4A843', amount:70, location:'AMS Slot 3',  rfid:false, ams:true,  notes:'Beautiful finish. Decorative use.' },
   { id:'SP-007', brand:'Bambu Lab',  material:'PLA-CF',    color:'Carbon Black',       colorHex:'#2C2C2C', amount:30, location:'Dry Box 2',   rfid:true,  ams:false, notes:'Hardened Steel nozzle required. Abrasive!' },
@@ -1025,8 +1025,8 @@ const FILTERS = [
   { label:'ABS', val:'ABS' },
   { label:'TPU', val:'TPU' },
   { label:'ASA', val:'ASA' },
-  { label:'âœ… AMS', val:'ams' },
-  { label:'âš ï¸ Low', val:'low' },
+  { label:'✅ AMS', val:'ams' },
+  { label:'⚠️ Low', val:'low' },
 ];
 
 function load() {
@@ -1037,7 +1037,7 @@ function load() {
 
 function save(spools) { localStorage.setItem(KEY, JSON.stringify(spools)); }
 
-// â”€â”€ RENDER â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── RENDER ─────────────────────────────────────────────────
 function render() {
   const spools = load();
   const q = document.getElementById('searchInput').value.toLowerCase().trim();
@@ -1095,7 +1095,7 @@ function buildCard(s) {
   el.onclick = () => openDetail(s.id);
 
   const badges = `<span class="badge badge-mat">${esc(s.material)}</span>`
-    + (s.ams  ? '<span class="badge badge-ams">AMS âœ“</span>' : '')
+    + (s.ams  ? '<span class="badge badge-ams">AMS ✓</span>' : '')
     + (s.rfid ? '<span class="badge badge-rfid">RFID</span>' : '')
     + (s.amount <= 20 ? '<span class="badge badge-low">Low</span>' : '');
 
@@ -1106,7 +1106,7 @@ function buildCard(s) {
       <div class="card-info">
         <div class="card-name">${esc(s.color)} ${esc(s.material)}</div>
         <div class="card-sub">${esc(s.brand)}</div>
-        ${s.location ? `<div class="card-location">ðŸ“ ${esc(s.location)}</div>` : ''}
+        ${s.location ? `<div class="card-location">📍 ${esc(s.location)}</div>` : ''}
       </div>
     </div>
     <div class="card-badges">${badges}</div>
@@ -1120,7 +1120,7 @@ function buildCard(s) {
   return el;
 }
 
-// â”€â”€ DETAIL SHEET â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── DETAIL SHEET ───────────────────────────────────────────
 function openDetail(id) {
   const spools = load();
   const s = spools.find(x => x.id === id);
@@ -1140,9 +1140,9 @@ function openDetail(id) {
 
   const info = document.getElementById('dInfoSection');
   info.innerHTML = [
-    ['Location', s.location || 'â€”'],
-    ['AMS Safe', s.ams ? 'âœ… Yes' : 'âŒ No'],
-    ['Bambu RFID', s.rfid ? 'ðŸ“¡ Yes' : 'No'],
+    ['Location', s.location || '—'],
+    ['AMS Safe', s.ams ? '✅ Yes' : '❌ No'],
+    ['Bambu RFID', s.rfid ? '📡 Yes' : 'No'],
   ].map(([k,v]) => `<div class="detail-row"><span class="detail-row-key">${k}</span><span class="detail-row-val">${v}</span></div>`).join('');
 
   const notesEl = document.getElementById('dNotesSection');
@@ -1172,7 +1172,7 @@ function saveDetailAmount() {
   save(spools);
   render();
   closeDetail();
-  showToast('Amount updated âœ“');
+  showToast('Amount updated ✓');
 }
 
 function closeDetail() {
@@ -1190,7 +1190,7 @@ document.getElementById('detailOverlay').addEventListener('click', function(e) {
   if (e.target === this) closeDetail();
 });
 
-// â”€â”€ FORM SHEET â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── FORM SHEET ─────────────────────────────────────────────
 function openForm(id) {
   editingId = id;
   document.getElementById('formTitle').textContent = id ? 'Edit Spool' : 'New Spool';
@@ -1265,11 +1265,11 @@ function saveSpool() {
   if (editingId) {
     const i = spools.findIndex(s => s.id === editingId);
     if (i > -1) spools[i] = spool;
-    showToast('Spool updated âœ“');
+    showToast('Spool updated ✓');
   } else {
     if (spools.find(s => s.id === id)) { showToast('ID already exists'); return; }
     spools.unshift(spool);
-    showToast('Spool added âœ“');
+    showToast('Spool added ✓');
   }
 
   save(spools);
@@ -1286,7 +1286,7 @@ function deleteSpool() {
   showToast('Deleted');
 }
 
-// â”€â”€ NFC DEEP LINK â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── NFC DEEP LINK ──────────────────────────────────────────
 function checkNfcParam() {
   const params = new URLSearchParams(window.location.search);
   const id = params.get('id') || params.get('spool');
@@ -1305,7 +1305,7 @@ function checkNfcParam() {
   }, 300);
 }
 
-// â”€â”€ HELPERS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── HELPERS ────────────────────────────────────────────────
 function nextId() {
   const spools = load();
   const nums = spools.map(s => parseInt(s.id.replace(/\D/g,''))).filter(n => !isNaN(n));
@@ -1324,7 +1324,7 @@ function showToast(msg) {
   setTimeout(() => t.classList.remove('show'), 2200);
 }
 
-// â”€â”€ INIT â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── INIT ───────────────────────────────────────────────────
 render();
 checkNfcParam();
 </script>
