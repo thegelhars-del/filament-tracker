@@ -1,0 +1,1332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#ffffff" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="Filament" />
+  <title>Filament Tracker</title>
+  <link rel="manifest" href="manifest.json" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #F2F2F7;
+      --surface: #FFFFFF;
+      --surface2: #F2F2F7;
+      --grouped: #EFEFF4;
+      --border: rgba(60,60,67,0.12);
+      --text: #000000;
+      --text2: #3C3C43;
+      --text3: #6C6C70;
+      --text4: #AEAEB2;
+      --accent: #007AFF;
+      --accent2: #5856D6;
+      --green: #34C759;
+      --orange: #FF9500;
+      --red: #FF3B30;
+      --separator: rgba(60,60,67,0.29);
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+    }
+
+    html, body {
+      height: 100%;
+      overflow: hidden;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      -webkit-font-smoothing: antialiased;
+      overscroll-behavior: none;
+    }
+
+    /* â”€â”€ APP SHELL â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+    #app {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      max-width: 430px;
+      margin: 0 auto;
+      position: relative;
+    }
+
+    /* â”€â”€ NAV BAR â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+    .navbar {
+      background: rgba(255,255,255,0.85);
+      backdrop-filter: saturate(180%) blur(20px);
+      -webkit-backdrop-filter: saturate(180%) blur(20px);
+      border-bottom: 1px solid var(--border);
+      padding-top: var(--safe-top);
+      flex-shrink: 0;
+      z-index: 50;
+    }
+
+    .navbar-inner {
+      display: flex;
+      align-items: center;
+      height: 52px;
+      padding: 0 16px;
+      gap: 8px;
+    }
+
+    .nav-title {
+      flex: 1;
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: -0.02em;
+    }
+
+    .nav-count {
+      font-size: 0.78rem;
+      color: var(--text3);
+      font-weight: 500;
+    }
+
+    .nav-btn {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      border: none;
+      background: var(--grouped);
+      color: var(--accent);
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background 0.15s;
+      flex-shrink: 0;
+    }
+
+    .nav-btn:active { background: var(--border); }
+
+    /* Search */
+    .search-bar {
+      padding: 8px 16px 12px;
+    }
+
+    .search-wrap {
+      position: relative;
+    }
+
+    .search-wrap input {
+      width: 100%;
+      background: var(--grouped);
+      border: none;
+      border-radius: 10px;
+      padding: 8px 12px 8px 34px;
+      font-family: inherit;
+      font-size: 0.93rem;
+      color: var(--text);
+      outline: none;
+    }
+
+    .search-wrap input::placeholder { color: var(--text4); }
+
+    .search-icon {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text4);
+      font-size: 0.85rem;
+      pointer-events: none;
+    }
+
+    /* â”€â”€ FILTER PILLS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+    .filter-row {
+      display: flex;
+      gap: 6px;
+      padding: 0 16px 12px;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      flex-shrink: 0;
+    }
+
+    .filter-row::-webkit-scrollbar { display: none; }
+
+    .pill {
+      flex-shrink: 0;
+      padding: 5px 13px;
+      border-radius: 100px;
+      border: none;
+      background: var(--surface);
+      color: var(--text3);
+      font-family: inherit;
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+      white-space: nowrap;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+    }
+
+    .pill.active { background: var(--accent); color: white; }
+
+    /* â”€â”€ SCROLL AREA â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+    .scroll-area {
+      flex: 1;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      padding: 0 16px 120px;
+    }
+
+    /* â”€â”€ SPOOL CARDS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+    .spool-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding-top: 4px;
+    }
+
+    .spool-card {
+      background: var(--surface);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.07);
+      cursor: pointer;
+      transition: transform 0.12s, box-shadow 0.12s;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+
+    .spool-card:active {
+      transform: scale(0.975);
+      box-shadow: 0 1px 1px rgba(0,0,0,0.04);
+    }
+
+    .card-color-strip {
+      height: 6px;
+    }
+
+    .card-body {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 14px 16px 10px;
+    }
+
+    .card-swatch {
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      flex-shrink: 0;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+      border: 1px solid rgba(0,0,0,0.06);
+    }
+
+    .card-info { flex: 1; min-width: 0; }
+
+    .card-name {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: -0.01em;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .card-sub {
+      font-size: 0.8rem;
+      color: var(--text3);
+      margin-top: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .card-location {
+      font-size: 0.75rem;
+      color: var(--text4);
+      margin-top: 3px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .card-amount-row {
+      padding: 0 16px 14px;
+    }
+
+    .amount-track {
+      height: 4px;
+      background: var(--grouped);
+      border-radius: 100px;
+      overflow: hidden;
+    }
+
+    .amount-fill {
+      height: 100%;
+      border-radius: 100px;
+      transition: width 0.3s ease;
+    }
+
+    .amount-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.7rem;
+      color: var(--text4);
+      font-weight: 500;
+      margin-top: 4px;
+    }
+
+    .card-badges {
+      display: flex;
+      gap: 5px;
+      padding: 0 16px 12px;
+    }
+
+    .badge {
+      font-size: 0.68rem;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 100px;
+    }
+
+    .badge-mat  { background: #EEF2FF; color: #4F46E5; }
+    .badge-ams  { background: #EDFAF1; color: #1A8F3C; }
+    .badge-rfid { background: #FFF4E6; color: #C05E00; }
+    .badge-low  { background: #FFF0EF; color: #D70015; }
+
+    /* â”€â”€ EMPTY STATE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+    .empty {
+      text-align: center;
+      padding: 60px 24px;
+      color: var(--text3);
+    }
+
+    .empty-icon { font-size: 3rem; margin-bottom: 12px; }
+    .empty h3 { font-size: 1rem; font-weight: 600; color: var(--text2); margin-bottom: 6px; }
+    .empty p  { font-size: 0.875rem; line-height: 1.5; }
+
+    /* â”€â”€ FAB â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+    .fab {
+      position: fixed;
+      bottom: calc(24px + var(--safe-bottom));
+      right: calc(50% - 215px + 20px);
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: white;
+      font-size: 1.6rem;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 4px 20px rgba(0,122,255,0.45);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      transition: transform 0.15s, box-shadow 0.15s;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .fab:active { transform: scale(0.92); }
+
+    @media (max-width: 430px) {
+      .fab { right: 20px; }
+    }
+
+    /* â”€â”€ BOTTOM SHEET â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+    .sheet-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.4);
+      z-index: 200;
+      align-items: flex-end;
+      justify-content: center;
+    }
+
+    .sheet-overlay.open { display: flex; }
+
+    .sheet {
+      background: var(--surface);
+      border-radius: 20px 20px 0 0;
+      width: 100%;
+      max-width: 430px;
+      max-height: 92vh;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      padding-bottom: var(--safe-bottom);
+      animation: sheetUp 0.3s cubic-bezier(0.32,0.72,0,1);
+    }
+
+    @keyframes sheetUp {
+      from { transform: translateY(100%); }
+      to   { transform: translateY(0); }
+    }
+
+    .sheet-handle {
+      width: 36px;
+      height: 4px;
+      background: var(--border);
+      border-radius: 100px;
+      margin: 10px auto 0;
+    }
+
+    /* â”€â”€ DETAIL SHEET â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+    .detail-header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 20px 20px 16px;
+    }
+
+    .detail-swatch {
+      width: 64px;
+      height: 64px;
+      border-radius: 18px;
+      flex-shrink: 0;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.18);
+      border: 1px solid rgba(0,0,0,0.06);
+    }
+
+    .detail-title {
+      flex: 1;
+    }
+
+    .detail-name {
+      font-size: 1.2rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: var(--text);
+    }
+
+    .detail-brand {
+      font-size: 0.875rem;
+      color: var(--text3);
+      margin-top: 2px;
+    }
+
+    .detail-id {
+      font-size: 0.72rem;
+      color: var(--text4);
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      margin-top: 4px;
+    }
+
+    /* Amount quick-update */
+    .amount-section {
+      margin: 0 20px 16px;
+      background: var(--grouped);
+      border-radius: 14px;
+      padding: 16px;
+    }
+
+    .amount-section-title {
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--text3);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 10px;
+    }
+
+    .amount-big {
+      font-size: 2rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      color: var(--text);
+      line-height: 1;
+      margin-bottom: 10px;
+    }
+
+    .amount-slider {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 6px;
+      border-radius: 100px;
+      background: rgba(0,0,0,0.1);
+      outline: none;
+      cursor: pointer;
+    }
+
+    .amount-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: white;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+      cursor: pointer;
+      transition: transform 0.1s;
+    }
+
+    .amount-slider:active::-webkit-slider-thumb { transform: scale(1.2); }
+
+    /* Detail info rows */
+    .detail-section {
+      margin: 0 20px 12px;
+      background: var(--grouped);
+      border-radius: 14px;
+      overflow: hidden;
+    }
+
+    .detail-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .detail-row:last-child { border-bottom: none; }
+
+    .detail-row-key {
+      font-size: 0.875rem;
+      color: var(--text2);
+    }
+
+    .detail-row-val {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--text);
+      text-align: right;
+      max-width: 60%;
+    }
+
+    .detail-notes {
+      margin: 0 20px 12px;
+      background: var(--grouped);
+      border-radius: 14px;
+      padding: 14px 16px;
+    }
+
+    .detail-notes-label {
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--text3);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 6px;
+    }
+
+    .detail-notes-text {
+      font-size: 0.875rem;
+      color: var(--text2);
+      line-height: 1.5;
+    }
+
+    .detail-actions {
+      display: flex;
+      gap: 10px;
+      padding: 4px 20px 20px;
+    }
+
+    .detail-btn {
+      flex: 1;
+      padding: 14px;
+      border-radius: 14px;
+      border: none;
+      font-family: inherit;
+      font-size: 0.93rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.15s;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .detail-btn:active { opacity: 0.7; }
+    .detail-btn-edit { background: var(--accent); color: white; }
+    .detail-btn-close { background: var(--grouped); color: var(--text2); }
+    .detail-btn-save { background: var(--green); color: white; }
+
+    /* â”€â”€ FORM SHEET â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+    .form-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 20px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .form-header-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+    }
+
+    .form-header-btn {
+      font-family: inherit;
+      font-size: 0.93rem;
+      font-weight: 600;
+      color: var(--accent);
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 4px 0;
+    }
+
+    .form-header-btn.destructive { color: var(--red); }
+
+    .form-body {
+      padding: 16px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .form-section-title {
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--text3);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-top: 6px;
+    }
+
+    .form-group {
+      background: var(--grouped);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .form-row {
+      display: flex;
+      align-items: center;
+      padding: 0 14px;
+      border-bottom: 1px solid var(--border);
+      min-height: 48px;
+    }
+
+    .form-row:last-child { border-bottom: none; }
+
+    .form-row label {
+      font-size: 0.875rem;
+      color: var(--text2);
+      min-width: 90px;
+      flex-shrink: 0;
+    }
+
+    .form-row input,
+    .form-row select,
+    .form-row textarea {
+      flex: 1;
+      border: none;
+      background: none;
+      font-family: inherit;
+      font-size: 0.875rem;
+      color: var(--text);
+      text-align: right;
+      outline: none;
+      padding: 12px 0;
+    }
+
+    .form-row textarea {
+      text-align: left;
+      resize: none;
+      padding: 12px 0;
+    }
+
+    .form-row select { -webkit-appearance: none; }
+
+    /* Color row */
+    .color-form-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .color-form-row label { font-size: 0.875rem; color: var(--text2); }
+
+    .color-form-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .color-name-input {
+      border: none;
+      background: none;
+      font-family: inherit;
+      font-size: 0.875rem;
+      color: var(--text);
+      text-align: right;
+      outline: none;
+      width: 100px;
+    }
+
+    .color-swatch-btn {
+      width: 30px;
+      height: 30px;
+      border-radius: 8px;
+      border: 1px solid rgba(0,0,0,0.1);
+      overflow: hidden;
+      cursor: pointer;
+      flex-shrink: 0;
+      padding: 0;
+      position: relative;
+    }
+
+    .color-swatch-btn input[type="color"] {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border: none;
+      padding: 0;
+      cursor: pointer;
+      opacity: 0;
+    }
+
+    /* Toggle row */
+    .toggle-form-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .toggle-form-row:last-child { border-bottom: none; }
+    .toggle-form-row label { font-size: 0.875rem; color: var(--text2); }
+
+    .toggle {
+      position: relative;
+      width: 50px;
+      height: 30px;
+    }
+
+    .toggle input { opacity: 0; width: 0; height: 0; }
+
+    .toggle-track {
+      position: absolute;
+      inset: 0;
+      background: var(--border);
+      border-radius: 100px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .toggle input:checked + .toggle-track { background: var(--green); }
+
+    .toggle-track::after {
+      content: '';
+      position: absolute;
+      width: 24px;
+      height: 24px;
+      top: 3px;
+      left: 3px;
+      background: white;
+      border-radius: 50%;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+      transition: transform 0.2s cubic-bezier(0.34,1.4,0.64,1);
+    }
+
+    .toggle input:checked + .toggle-track::after { transform: translateX(20px); }
+
+    /* Slider in form */
+    .slider-form-row {
+      padding: 14px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .slider-form-row label {
+      font-size: 0.875rem;
+      color: var(--text2);
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+
+    .slider-form-row label span {
+      font-weight: 600;
+      color: var(--accent);
+    }
+
+    /* Form amount slider */
+    .form-slider {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 6px;
+      border-radius: 100px;
+      background: rgba(0,0,0,0.1);
+      outline: none;
+      cursor: pointer;
+    }
+
+    .form-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 2px 6px rgba(0,122,255,0.4);
+      cursor: pointer;
+    }
+
+    .form-save-btn {
+      width: 100%;
+      padding: 16px;
+      border-radius: 14px;
+      background: var(--accent);
+      color: white;
+      border: none;
+      font-family: inherit;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 6px;
+      transition: opacity 0.15s;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .form-save-btn:active { opacity: 0.8; }
+
+    .form-delete-btn {
+      width: 100%;
+      padding: 14px;
+      border-radius: 14px;
+      background: #FFF0EF;
+      color: var(--red);
+      border: none;
+      font-family: inherit;
+      font-size: 0.93rem;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 4px;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* â”€â”€ NFC HIGHLIGHT â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+    .nfc-highlight {
+      animation: nfcPulse 0.5s ease;
+    }
+
+    @keyframes nfcPulse {
+      0%   { box-shadow: 0 0 0 0 rgba(0,122,255,0.5); }
+      50%  { box-shadow: 0 0 0 12px rgba(0,122,255,0); }
+      100% { box-shadow: 0 0 0 0 rgba(0,122,255,0); }
+    }
+
+    /* â”€â”€ TOAST â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+    .toast {
+      position: fixed;
+      bottom: calc(90px + var(--safe-bottom));
+      left: 50%;
+      transform: translateX(-50%) translateY(8px);
+      background: rgba(28,28,30,0.9);
+      backdrop-filter: blur(10px);
+      color: white;
+      padding: 8px 18px;
+      border-radius: 100px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s, transform 0.2s;
+      z-index: 999;
+    }
+
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  </style>
+</head>
+<body>
+<div id="app">
+
+  <!-- NAV -->
+  <div class="navbar">
+    <div class="navbar-inner">
+      <div class="nav-title">ðŸ§µ Filament</div>
+      <span class="nav-count" id="navCount"></span>
+    </div>
+    <div class="search-bar">
+      <div class="search-wrap">
+        <span class="search-icon">ðŸ”</span>
+        <input id="searchInput" type="search" placeholder="Search color, brand, materialâ€¦" oninput="render()" />
+      </div>
+    </div>
+    <div class="filter-row" id="filterRow"></div>
+  </div>
+
+  <!-- SCROLL -->
+  <div class="scroll-area">
+    <div class="spool-list" id="spoolList"></div>
+    <div class="empty" id="emptyState" style="display:none">
+      <div class="empty-icon">ðŸ§µ</div>
+      <h3>No spools found</h3>
+      <p>Try a different search or filter.</p>
+    </div>
+  </div>
+
+  <!-- FAB -->
+  <button class="fab" onclick="openForm(null)" title="Add Spool">+</button>
+
+</div>
+
+<!-- DETAIL SHEET -->
+<div class="sheet-overlay" id="detailOverlay">
+  <div class="sheet" id="detailSheet">
+    <div class="sheet-handle"></div>
+    <div class="detail-header">
+      <div class="detail-swatch" id="dSwatch"></div>
+      <div class="detail-title">
+        <div class="detail-name" id="dName"></div>
+        <div class="detail-brand" id="dBrand"></div>
+        <div class="detail-id" id="dId"></div>
+      </div>
+    </div>
+
+    <!-- Quick amount update -->
+    <div class="amount-section">
+      <div class="amount-section-title">Amount Remaining</div>
+      <div class="amount-big" id="dAmountBig">â€”</div>
+      <input type="range" class="amount-slider" id="dAmountSlider" min="0" max="100" step="5"
+        oninput="updateDetailAmount(this.value)" />
+      <div style="display:flex;justify-content:space-between;font-size:0.7rem;color:var(--text4);margin-top:6px">
+        <span>Empty</span><span>Full</span>
+      </div>
+    </div>
+
+    <div class="detail-section" id="dInfoSection"></div>
+
+    <div class="detail-notes" id="dNotesSection" style="display:none">
+      <div class="detail-notes-label">Notes</div>
+      <div class="detail-notes-text" id="dNotes"></div>
+    </div>
+
+    <div class="detail-actions">
+      <button class="detail-btn detail-btn-save" onclick="saveDetailAmount()">ðŸ’¾ Save Amount</button>
+      <button class="detail-btn detail-btn-edit" onclick="openFormFromDetail()">Edit</button>
+      <button class="detail-btn detail-btn-close" onclick="closeDetail()">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- FORM SHEET -->
+<div class="sheet-overlay" id="formOverlay">
+  <div class="sheet" id="formSheet">
+    <div class="sheet-handle"></div>
+    <div class="form-header">
+      <button class="form-header-btn" onclick="closeForm()">Cancel</button>
+      <span class="form-header-title" id="formTitle">New Spool</span>
+      <button class="form-header-btn" onclick="saveSpool()">Save</button>
+    </div>
+    <div class="form-body">
+
+      <div class="form-section-title">Identity</div>
+      <div class="form-group">
+        <div class="form-row">
+          <label>Spool ID</label>
+          <input type="text" id="fId" placeholder="SP-001" />
+        </div>
+        <div class="form-row">
+          <label>Brand</label>
+          <input type="text" id="fBrand" placeholder="Bambu Lab" />
+        </div>
+        <div class="form-row">
+          <label>Material</label>
+          <select id="fMaterial">
+            <option value="">Selectâ€¦</option>
+            <option>PLA</option><option>PLA+</option><option>PLA Basic</option>
+            <option>PETG</option><option>ABS</option><option>ASA</option>
+            <option>TPU 95A</option><option>TPU 87A</option>
+            <option>PA (Nylon)</option><option>PC</option>
+            <option>PLA-CF</option><option>PETG-CF</option><option>PA-CF</option>
+            <option>Support</option><option>Other</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-section-title">Color</div>
+      <div class="form-group">
+        <div class="color-form-row">
+          <label>Color</label>
+          <div class="color-form-right">
+            <input class="color-name-input" type="text" id="fColor" placeholder="e.g. Silk Gold" />
+            <div class="color-swatch-btn" id="fSwatchBtn">
+              <input type="color" id="fColorHex" value="#1E88E5" oninput="onColorChange()" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section-title">Amount</div>
+      <div class="form-group">
+        <div class="slider-form-row">
+          <label>Remaining <span id="fAmountLabel">100%</span></label>
+          <input type="range" class="form-slider" id="fAmount" min="0" max="100" step="5" value="100"
+            oninput="document.getElementById('fAmountLabel').textContent = this.value + '%'" />
+        </div>
+      </div>
+
+      <div class="form-section-title">Storage</div>
+      <div class="form-group">
+        <div class="form-row">
+          <label>Location</label>
+          <input type="text" id="fLocation" placeholder="Shelf A / AMS Slot 1" />
+        </div>
+      </div>
+
+      <div class="form-section-title">Compatibility</div>
+      <div class="form-group">
+        <div class="toggle-form-row">
+          <label>AMS Safe</label>
+          <label class="toggle"><input type="checkbox" id="fAms" /><span class="toggle-track"></span></label>
+        </div>
+        <div class="toggle-form-row">
+          <label>Bambu RFID Chip</label>
+          <label class="toggle"><input type="checkbox" id="fRfid" /><span class="toggle-track"></span></label>
+        </div>
+      </div>
+
+      <div class="form-section-title">Notes</div>
+      <div class="form-group">
+        <div class="form-row">
+          <textarea id="fNotes" rows="3" placeholder="Drying tips, nozzle requirements, print tempâ€¦"></textarea>
+        </div>
+      </div>
+
+      <button class="form-save-btn" onclick="saveSpool()">Save Spool</button>
+      <button class="form-delete-btn" id="deleteBtn" style="display:none" onclick="deleteSpool()">Delete Spool</button>
+      <div style="height:8px"></div>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// â”€â”€ DATA â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+const KEY = 'filament_v2';
+let editingId = null;
+let detailId  = null;
+let activeFilter = 'all';
+
+const SAMPLES = [
+  { id:'SP-001', brand:'Bambu Lab',  material:'PLA Basic', color:'Bambu Green',       colorHex:'#2DB55D', amount:80, location:'AMS Slot 1',  rfid:true,  ams:true,  notes:'Default spool. Great all-rounder.' },
+  { id:'SP-002', brand:'Bambu Lab',  material:'PLA Basic', color:'Matte White',        colorHex:'#F0EEE9', amount:45, location:'AMS Slot 2',  rfid:true,  ams:true,  notes:'Shows fingerprints easily â€” handle with care.' },
+  { id:'SP-003', brand:'eSUN',       material:'PETG',      color:'Transparent Blue',   colorHex:'#4488CC', amount:95, location:'Shelf A',     rfid:false, ams:true,  notes:'Brand new. Dry before use if stored >2 weeks.' },
+  { id:'SP-004', brand:'Polymaker',  material:'ASA',       color:'Urban Grey',         colorHex:'#8A8D8F', amount:60, location:'Dry Box 1',   rfid:false, ams:false, notes:'Enclosure only â€” warps badly open air.' },
+  { id:'SP-005', brand:'Bambu Lab',  material:'TPU 95A',   color:'Jet Black',          colorHex:'#1A1A1A', amount:15, location:'Shelf B',     rfid:true,  ams:false, notes:'Running low! Direct feed only.' },
+  { id:'SP-006', brand:'Hatchbox',   material:'PLA+',      color:'Silk Gold',          colorHex:'#D4A843', amount:70, location:'AMS Slot 3',  rfid:false, ams:true,  notes:'Beautiful finish. Decorative use.' },
+  { id:'SP-007', brand:'Bambu Lab',  material:'PLA-CF',    color:'Carbon Black',       colorHex:'#2C2C2C', amount:30, location:'Dry Box 2',   rfid:true,  ams:false, notes:'Hardened Steel nozzle required. Abrasive!' },
+];
+
+const FILTERS = [
+  { label:'All', val:'all' },
+  { label:'PLA', val:'PLA' },
+  { label:'PETG', val:'PETG' },
+  { label:'ABS', val:'ABS' },
+  { label:'TPU', val:'TPU' },
+  { label:'ASA', val:'ASA' },
+  { label:'âœ… AMS', val:'ams' },
+  { label:'âš ï¸ Low', val:'low' },
+];
+
+function load() {
+  const raw = localStorage.getItem(KEY);
+  if (!raw) { save(SAMPLES); return SAMPLES; }
+  return JSON.parse(raw);
+}
+
+function save(spools) { localStorage.setItem(KEY, JSON.stringify(spools)); }
+
+// â”€â”€ RENDER â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+function render() {
+  const spools = load();
+  const q = document.getElementById('searchInput').value.toLowerCase().trim();
+
+  const filtered = spools.filter(s => {
+    const text = [s.id,s.brand,s.material,s.color,s.location,s.notes].join(' ').toLowerCase();
+    const matchQ = !q || text.includes(q);
+    let matchF = true;
+    if (activeFilter === 'ams') matchF = s.ams;
+    else if (activeFilter === 'low') matchF = s.amount <= 20;
+    else if (activeFilter !== 'all') matchF = s.material.toUpperCase().startsWith(activeFilter);
+    return matchQ && matchF;
+  });
+
+  // count
+  document.getElementById('navCount').textContent = spools.length + ' spool' + (spools.length !== 1 ? 's' : '');
+
+  // filter pills
+  const fr = document.getElementById('filterRow');
+  if (!fr.children.length) {
+    FILTERS.forEach(f => {
+      const btn = document.createElement('button');
+      btn.className = 'pill' + (f.val === activeFilter ? ' active' : '');
+      btn.textContent = f.label;
+      btn.onclick = () => { activeFilter = f.val; render(); };
+      fr.appendChild(btn);
+    });
+  } else {
+    fr.querySelectorAll('.pill').forEach((btn, i) => {
+      btn.className = 'pill' + (FILTERS[i].val === activeFilter ? ' active' : '');
+    });
+  }
+
+  // list
+  const list = document.getElementById('spoolList');
+  const empty = document.getElementById('emptyState');
+  list.innerHTML = '';
+
+  if (!filtered.length) { empty.style.display = 'block'; return; }
+  empty.style.display = 'none';
+
+  filtered.forEach(s => list.appendChild(buildCard(s)));
+}
+
+function amountColor(n) {
+  if (n > 50) return 'var(--green)';
+  if (n > 20) return 'var(--orange)';
+  return 'var(--red)';
+}
+
+function buildCard(s) {
+  const el = document.createElement('div');
+  el.className = 'spool-card';
+  el.id = 'card-' + s.id;
+  el.onclick = () => openDetail(s.id);
+
+  const badges = `<span class="badge badge-mat">${esc(s.material)}</span>`
+    + (s.ams  ? '<span class="badge badge-ams">AMS âœ“</span>' : '')
+    + (s.rfid ? '<span class="badge badge-rfid">RFID</span>' : '')
+    + (s.amount <= 20 ? '<span class="badge badge-low">Low</span>' : '');
+
+  el.innerHTML = `
+    <div class="card-color-strip" style="background:${s.colorHex}"></div>
+    <div class="card-body">
+      <div class="card-swatch" style="background:${s.colorHex}"></div>
+      <div class="card-info">
+        <div class="card-name">${esc(s.color)} ${esc(s.material)}</div>
+        <div class="card-sub">${esc(s.brand)}</div>
+        ${s.location ? `<div class="card-location">ðŸ“ ${esc(s.location)}</div>` : ''}
+      </div>
+    </div>
+    <div class="card-badges">${badges}</div>
+    <div class="card-amount-row">
+      <div class="amount-track">
+        <div class="amount-fill" style="width:${s.amount}%;background:${amountColor(s.amount)}"></div>
+      </div>
+      <div class="amount-label"><span>Amount</span><span style="color:${amountColor(s.amount)};font-weight:700">${s.amount}%</span></div>
+    </div>
+  `;
+  return el;
+}
+
+// â”€â”€ DETAIL SHEET â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+function openDetail(id) {
+  const spools = load();
+  const s = spools.find(x => x.id === id);
+  if (!s) return;
+  detailId = id;
+
+  document.getElementById('dSwatch').style.background = s.colorHex;
+  document.getElementById('dName').textContent = s.color + ' ' + s.material;
+  document.getElementById('dBrand').textContent = s.brand;
+  document.getElementById('dId').textContent = 'ID: ' + s.id;
+
+  const slider = document.getElementById('dAmountSlider');
+  slider.value = s.amount;
+  slider.style.background = `linear-gradient(to right, ${amountColor(s.amount)} ${s.amount}%, rgba(0,0,0,0.1) ${s.amount}%)`;
+  document.getElementById('dAmountBig').textContent = s.amount + '%';
+  document.getElementById('dAmountBig').style.color = amountColor(s.amount);
+
+  const info = document.getElementById('dInfoSection');
+  info.innerHTML = [
+    ['Location', s.location || 'â€”'],
+    ['AMS Safe', s.ams ? 'âœ… Yes' : 'âŒ No'],
+    ['Bambu RFID', s.rfid ? 'ðŸ“¡ Yes' : 'No'],
+  ].map(([k,v]) => `<div class="detail-row"><span class="detail-row-key">${k}</span><span class="detail-row-val">${v}</span></div>`).join('');
+
+  const notesEl = document.getElementById('dNotesSection');
+  if (s.notes) {
+    notesEl.style.display = 'block';
+    document.getElementById('dNotes').textContent = s.notes;
+  } else {
+    notesEl.style.display = 'none';
+  }
+
+  document.getElementById('detailOverlay').classList.add('open');
+}
+
+function updateDetailAmount(val) {
+  document.getElementById('dAmountBig').textContent = val + '%';
+  document.getElementById('dAmountBig').style.color = amountColor(parseInt(val));
+  const slider = document.getElementById('dAmountSlider');
+  slider.style.background = `linear-gradient(to right, ${amountColor(parseInt(val))} ${val}%, rgba(0,0,0,0.1) ${val}%)`;
+}
+
+function saveDetailAmount() {
+  if (!detailId) return;
+  const spools = load();
+  const s = spools.find(x => x.id === detailId);
+  if (!s) return;
+  s.amount = parseInt(document.getElementById('dAmountSlider').value);
+  save(spools);
+  render();
+  closeDetail();
+  showToast('Amount updated âœ“');
+}
+
+function closeDetail() {
+  document.getElementById('detailOverlay').classList.remove('open');
+  detailId = null;
+}
+
+function openFormFromDetail() {
+  const id = detailId;
+  closeDetail();
+  setTimeout(() => openForm(id), 50);
+}
+
+document.getElementById('detailOverlay').addEventListener('click', function(e) {
+  if (e.target === this) closeDetail();
+});
+
+// â”€â”€ FORM SHEET â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+function openForm(id) {
+  editingId = id;
+  document.getElementById('formTitle').textContent = id ? 'Edit Spool' : 'New Spool';
+  document.getElementById('deleteBtn').style.display = id ? 'block' : 'none';
+
+  if (id) {
+    const s = load().find(x => x.id === id);
+    if (s) {
+      document.getElementById('fId').value = s.id;
+      document.getElementById('fBrand').value = s.brand;
+      document.getElementById('fMaterial').value = s.material;
+      document.getElementById('fColor').value = s.color;
+      document.getElementById('fColorHex').value = s.colorHex || '#888888';
+      document.getElementById('fSwatchBtn').style.background = s.colorHex || '#888888';
+      document.getElementById('fAmount').value = s.amount;
+      document.getElementById('fAmountLabel').textContent = s.amount + '%';
+      document.getElementById('fLocation').value = s.location || '';
+      document.getElementById('fAms').checked = s.ams;
+      document.getElementById('fRfid').checked = s.rfid;
+      document.getElementById('fNotes').value = s.notes || '';
+    }
+  } else {
+    document.getElementById('fId').value = nextId();
+    document.getElementById('fBrand').value = '';
+    document.getElementById('fMaterial').value = '';
+    document.getElementById('fColor').value = '';
+    document.getElementById('fColorHex').value = '#1E88E5';
+    document.getElementById('fSwatchBtn').style.background = '#1E88E5';
+    document.getElementById('fAmount').value = 100;
+    document.getElementById('fAmountLabel').textContent = '100%';
+    document.getElementById('fLocation').value = '';
+    document.getElementById('fAms').checked = false;
+    document.getElementById('fRfid').checked = false;
+    document.getElementById('fNotes').value = '';
+  }
+
+  document.getElementById('formOverlay').classList.add('open');
+}
+
+function closeForm() {
+  document.getElementById('formOverlay').classList.remove('open');
+  editingId = null;
+}
+
+document.getElementById('formOverlay').addEventListener('click', function(e) {
+  if (e.target === this) closeForm();
+});
+
+function onColorChange() {
+  const hex = document.getElementById('fColorHex').value;
+  document.getElementById('fSwatchBtn').style.background = hex;
+}
+
+function saveSpool() {
+  const id = document.getElementById('fId').value.trim();
+  if (!id) { showToast('Spool ID required'); return; }
+
+  const spool = {
+    id,
+    brand:    document.getElementById('fBrand').value.trim(),
+    material: document.getElementById('fMaterial').value || 'Unknown',
+    color:    document.getElementById('fColor').value.trim() || 'Unknown',
+    colorHex: document.getElementById('fColorHex').value,
+    amount:   parseInt(document.getElementById('fAmount').value),
+    location: document.getElementById('fLocation').value.trim(),
+    ams:      document.getElementById('fAms').checked,
+    rfid:     document.getElementById('fRfid').checked,
+    notes:    document.getElementById('fNotes').value.trim(),
+  };
+
+  let spools = load();
+  if (editingId) {
+    const i = spools.findIndex(s => s.id === editingId);
+    if (i > -1) spools[i] = spool;
+    showToast('Spool updated âœ“');
+  } else {
+    if (spools.find(s => s.id === id)) { showToast('ID already exists'); return; }
+    spools.unshift(spool);
+    showToast('Spool added âœ“');
+  }
+
+  save(spools);
+  closeForm();
+  render();
+}
+
+function deleteSpool() {
+  if (!editingId || !confirm('Delete this spool?')) return;
+  let spools = load().filter(s => s.id !== editingId);
+  save(spools);
+  closeForm();
+  render();
+  showToast('Deleted');
+}
+
+// â”€â”€ NFC DEEP LINK â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+function checkNfcParam() {
+  const params = new URLSearchParams(window.location.search);
+  const id = params.get('id') || params.get('spool');
+  if (!id) return;
+  // Wait for render, then open
+  setTimeout(() => {
+    const spools = load();
+    if (spools.find(s => s.id === id)) {
+      openDetail(id);
+      // Pulse the card if visible
+      const card = document.getElementById('card-' + id);
+      if (card) { card.classList.add('nfc-highlight'); card.scrollIntoView({behavior:'smooth', block:'center'}); }
+    } else {
+      showToast('Spool ' + id + ' not found');
+    }
+  }, 300);
+}
+
+// â”€â”€ HELPERS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+function nextId() {
+  const spools = load();
+  const nums = spools.map(s => parseInt(s.id.replace(/\D/g,''))).filter(n => !isNaN(n));
+  const next = nums.length ? Math.max(...nums) + 1 : 1;
+  return 'SP-' + String(next).padStart(3,'0');
+}
+
+function esc(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+// â”€â”€ INIT â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+render();
+checkNfcParam();
+</script>
+</body>
+</html>
