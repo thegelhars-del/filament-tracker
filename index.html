@@ -301,6 +301,31 @@
       gap: 4px;
     }
 
+    /* Quick location dropdown on card */
+    .card-location-select {
+      width: calc(100% - 32px);
+      margin: 0 16px 12px;
+      padding: 8px 12px;
+      border-radius: 10px;
+      border: 1.5px solid var(--border);
+      background: var(--surface2);
+      font-family: inherit;
+      font-size: 0.82rem;
+      font-weight: 500;
+      color: var(--text2);
+      outline: none;
+      cursor: pointer;
+      -webkit-appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23AEAEB2' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      padding-right: 32px;
+      transition: border-color 0.15s;
+    }
+
+    .card-location-select:focus { border-color: var(--accent); }
+    .card-location-select:active { border-color: var(--accent); }
+
     .card-amount-row {
       padding: 0 16px 14px;
     }
@@ -1085,7 +1110,21 @@
       <div class="form-group">
         <div class="form-row">
           <label>Location</label>
-          <input type="text" id="fLocation" placeholder="Shelf A / AMS Slot 1" />
+          <select id="fLocation">
+            <option value="">— Select —</option>
+            <option>Storage Bin 1</option>
+            <option>Storage Bin 2</option>
+            <option>Storage Bin 3</option>
+            <option>Storage Bin 4</option>
+            <option>AMS Unit A</option>
+            <option>AMS Unit B</option>
+            <option>AMS-HT Slot 1</option>
+            <option>AMS-HT Slot 2</option>
+            <option>AMS-HT Slot 3</option>
+            <option>AMS-HT Slot 4</option>
+            <option>AMS-HT Slot 5</option>
+            <option>Closet Storage</option>
+          </select>
         </div>
       </div>
 
@@ -1136,6 +1175,12 @@
 <script>
 // ── DATA ───────────────────────────────────────────────────
 const KEY = 'filament_v2';
+const LOCATIONS = [
+  'Storage Bin 1', 'Storage Bin 2', 'Storage Bin 3', 'Storage Bin 4',
+  'AMS Unit A', 'AMS Unit B',
+  'AMS-HT Slot 1', 'AMS-HT Slot 2', 'AMS-HT Slot 3', 'AMS-HT Slot 4', 'AMS-HT Slot 5',
+  'Closet Storage'
+];
 let editingId = null;
 let detailId  = null;
 let activeFilter = 'all';
@@ -1231,6 +1276,10 @@ function buildCard(s) {
     + (s.rfid ? '<span class="badge badge-rfid">RFID</span>' : '')
     + (s.amount <= 20 ? '<span class="badge badge-low">Low</span>' : '');
 
+  const locationOptions = LOCATIONS.map(loc =>
+    `<option value="${esc(loc)}" ${s.location === loc ? 'selected' : ''}>${esc(loc)}</option>`
+  ).join('');
+
   el.innerHTML = `
     <div class="card-color-strip" style="background:${s.colorHex}"></div>
     <div class="card-body">
@@ -1238,9 +1287,12 @@ function buildCard(s) {
       <div class="card-info">
         <div class="card-name">${esc(s.color)} ${esc(s.material)}</div>
         <div class="card-sub">${esc(s.brand)}</div>
-        ${s.location ? `<div class="card-location">&#x1F4CD; ${esc(s.location)}</div>` : ''}
       </div>
     </div>
+    <select class="card-location-select" onchange="updateLocation('${esc(s.id)}', this.value)" onclick="event.stopPropagation()">
+      <option value="">&#x1F4CD; Set Location…</option>
+      ${locationOptions}
+    </select>
     <div class="card-badges">${badges}</div>
     <div class="card-amount-row">
       <div class="amount-track">
@@ -1271,11 +1323,21 @@ function openDetail(id) {
   document.getElementById('dAmountBig').style.color = amountColor(s.amount);
 
   const info = document.getElementById('dInfoSection');
-  info.innerHTML = [
-    ['Location', s.location || '—'],
-    ['AMS Safe', s.ams ? '&#x2705; Yes' : '&#x274C; No'],
-    ['Bambu RFID', s.rfid ? '&#x1F4E1; Yes' : 'No'],
-  ].map(([k,v]) => `<div class="detail-row"><span class="detail-row-key">${k}</span><span class="detail-row-val">${v}</span></div>`).join('');
+  const locOptions = LOCATIONS.map(loc =>
+    `<option value="${esc(loc)}" ${s.location === loc ? 'selected' : ''}>${esc(loc)}</option>`
+  ).join('');
+  info.innerHTML = `
+    <div class="detail-row">
+      <span class="detail-row-key">Location</span>
+      <select style="-webkit-appearance:none;border:none;background:none;font-family:inherit;font-size:0.875rem;font-weight:600;color:var(--accent);text-align:right;outline:none;cursor:pointer;max-width:60%"
+        onchange="updateLocation('${esc(s.id)}', this.value)">
+        <option value="">— Set Location —</option>
+        ${locOptions}
+      </select>
+    </div>
+    <div class="detail-row"><span class="detail-row-key">AMS Safe</span><span class="detail-row-val">${s.ams ? '&#x2705; Yes' : '&#x274C; No'}</span></div>
+    <div class="detail-row"><span class="detail-row-key">Bambu RFID</span><span class="detail-row-val">${s.rfid ? '&#x1F4E1; Yes' : 'No'}</span></div>
+  `;
 
   const notesEl = document.getElementById('dNotesSection');
   if (s.notes) {
@@ -1447,6 +1509,16 @@ function checkNfcParam() {
 }
 
 // ── HELPERS ────────────────────────────────────────────────
+function updateLocation(id, newLocation) {
+  let spools = load();
+  const s = spools.find(x => x.id === id);
+  if (!s) return;
+  s.location = newLocation;
+  save(spools);
+  render();
+  if (newLocation) showToast('Moved to ' + newLocation);
+}
+
 function nextId() {
   const spools = load();
   const nums = spools.map(s => parseInt(s.id.replace(/\D/g,''))).filter(n => !isNaN(n));
